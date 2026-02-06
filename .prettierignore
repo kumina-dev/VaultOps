@@ -1,0 +1,20 @@
+node_modules
+.expo
+expo-env.d.ts
+dist
+build
+coverage
+*.min.*
+*.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+*.log
+
+# Native / platform folders if you have them
+android
+ios
+
+# Bundler artifacts
+web-build

@@ -21,10 +21,26 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.thekumina.VaultOps"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-sqlite",
+        {
+          "useSQLCipher": true
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": "Allow VaultOps to use Face ID to unlock your vault."
+        }
+      ]
+    ]
   }
 }
