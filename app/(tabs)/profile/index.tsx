@@ -42,6 +42,12 @@ export default function ProfileScreen() {
           DB Status
         </Link>
         <Link
+          href="/(tabs)/profile/reminders"
+          style={{ color: theme.colors.neon, marginBottom: theme.spacing(1) }}
+        >
+          Reminders
+        </Link>
+        <Link
           href="/(tabs)/profile/exports"
           style={{ color: theme.colors.neon }}
         >

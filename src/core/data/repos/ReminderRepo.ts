@@ -109,6 +109,42 @@ export class ReminderRepo {
     await this.client.run(sql, [...params, id], "reminder.update");
   }
 
+  async cancelReminder(id: UUID): Promise<void> {
+    await this.updateReminder(id, { status: "cancelled", snoozeUntil: null });
+  }
+
+  async snoozeReminder(id: UUID, until: string): Promise<void> {
+    await this.updateReminder(id, { status: "snoozed", snoozeUntil: until });
+  }
+
+  async listUpcoming(limit: number): Promise<Reminder[]> {
+    const safeLimit = Math.max(0, limit);
+    const rows = await this.client.getAll<ReminderRow>(
+      `
+        SELECT * FROM reminders
+        WHERE status IN ('scheduled', 'snoozed')
+        ORDER BY COALESCE(snooze_until, fire_at) ASC
+        LIMIT ?
+      `,
+      [safeLimit],
+      "reminder.listUpcoming",
+    );
+    return rows.map(mapRowToReminder);
+  }
+
+  async listForItem(itemId: UUID): Promise<Reminder[]> {
+    const rows = await this.client.getAll<ReminderRow>(
+      `
+        SELECT * FROM reminders
+        WHERE item_id = ?
+        ORDER BY fire_at ASC
+      `,
+      [itemId],
+      "reminder.listForItem",
+    );
+    return rows.map(mapRowToReminder);
+  }
+
   async getReminder(id: UUID): Promise<Reminder | null> {
     const row = await this.client.getFirst<ReminderRow>(
       "SELECT * FROM reminders WHERE id = ?",

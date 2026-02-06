@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { createDbClient } from "../../src/core/data/db/DbClient";
@@ -32,6 +32,9 @@ const createId = (prefix: string) => {
 
 export default function QuickAddModal() {
   const router = useRouter();
+  const { type: initialType } = useLocalSearchParams<{
+    type?: QuickAddType;
+  }>();
   const { db } = useVault();
   const client = useMemo(() => (db ? createDbClient(db) : null), [db]);
   const [type, setType] = useState<QuickAddType>("note");
@@ -45,6 +48,13 @@ export default function QuickAddModal() {
   const [reminderRepeatRule, setReminderRepeatRule] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!initialType) return;
+    if (TYPE_OPTIONS.some((option) => option.value === initialType)) {
+      setType(initialType);
+    }
+  }, [initialType]);
 
   const handleCreate = async () => {
     if (!client) return;
