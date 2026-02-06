@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { createDbClient } from "../../src/core/data/db/DbClient";
 import { ItemRepo } from "../../src/core/data/repos/ItemRepo";
 import { ReminderRepo } from "../../src/core/data/repos/ReminderRepo";
+import { scheduleLinkIndexUpdate } from "../../src/core/services/links/linkIndexScheduler";
 import { useVault } from "../../src/core/services/security/VaultProvider";
 import { Card } from "../../src/ui/primitives/Card";
 import { NeonButton } from "../../src/ui/primitives/NeonButton";
@@ -80,6 +81,7 @@ export default function QuickAddModal() {
           title: title.trim(),
           body: body.trim() || null,
         });
+        scheduleLinkIndexUpdate(client, id);
         router.replace(`/(tabs)/notes/${id}`);
         return;
       }

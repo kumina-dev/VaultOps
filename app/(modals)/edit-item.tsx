@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 
 import { createDbClient } from "../../src/core/data/db/DbClient";
 import { ItemRepo } from "../../src/core/data/repos/ItemRepo";
+import { scheduleLinkIndexUpdate } from "../../src/core/services/links/linkIndexScheduler";
 import { useVault } from "../../src/core/services/security/VaultProvider";
 import { Card } from "../../src/ui/primitives/Card";
 import { NeonButton } from "../../src/ui/primitives/NeonButton";
@@ -91,6 +92,7 @@ export default function EditItemModal() {
           title: title.trim(),
           body: body.trim() || null,
         });
+        scheduleLinkIndexUpdate(client, id);
       }
       if (item.type === "task") {
         await repo.updateItem(id, {
