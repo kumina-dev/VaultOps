@@ -1,14 +1,8 @@
+import { readUserVersion, writeLastMigratedAt } from "./dbHealthRepo";
 import { MIGRATIONS } from "./migrations";
 import { SCHEMA_VERSION } from "./schema";
 
 import type * as SQLite from "expo-sqlite";
-
-async function getUserVersion(db: SQLite.SQLiteDatabase): Promise<number> {
-  const row = await db.getFirstAsync<{ user_version: number }>(
-    "PRAGMA user_version",
-  );
-  return row?.user_version ?? 0;
-}
 
 async function setUserVersion(
   db: SQLite.SQLiteDatabase,
@@ -26,7 +20,7 @@ export async function migrateIfNeeded(
 ): Promise<void> {
   await db.execAsync("PRAGMA foreign_keys = ON");
 
-  const current = await getUserVersion(db);
+  const current = await readUserVersion(db);
   if (current > SCHEMA_VERSION) {
     throw new Error(
       `DB user_version (${current}) is newer than app schema (${SCHEMA_VERSION}). Refusing to run.`,
@@ -54,4 +48,6 @@ export async function migrateIfNeeded(
   if (pending[pending.length - 1].version !== SCHEMA_VERSION) {
     await setUserVersion(db, SCHEMA_VERSION);
   }
+
+  await writeLastMigratedAt(db);
 }

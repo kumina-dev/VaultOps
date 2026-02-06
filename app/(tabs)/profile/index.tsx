@@ -36,6 +36,12 @@ export default function ProfileScreen() {
         />
         <View style={{ height: theme.spacing(1) }} />
         <Link
+          href="/(tabs)/profile/security"
+          style={{ color: theme.colors.neon, marginBottom: theme.spacing(1) }}
+        >
+          DB Status
+        </Link>
+        <Link
           href="/(tabs)/profile/exports"
           style={{ color: theme.colors.neon }}
         >
