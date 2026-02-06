@@ -4,6 +4,7 @@ export const META_KEYS = {
   lastMigratedAt: "db.last_migrated_at",
   linksLastRebuildAt: "links.last_rebuild_at",
   remindersLastReconcileAt: "reminders.last_reconcile_at",
+  inboxStrictCriteria: "inbox.strict_criteria",
 } as const;
 
 const CORE_TABLES = [

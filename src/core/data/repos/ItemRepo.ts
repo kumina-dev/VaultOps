@@ -1,3 +1,5 @@
+import { META_KEYS } from "../db/dbHealthRepo";
+
 import type {
   BaseItem,
   EventItem,
@@ -256,14 +258,33 @@ export class ItemRepo {
   }
 
   async listInbox(): Promise<Item[]> {
+    // Inbox definition:
+    // - Default: unarchived items with no area assignment.
+    // - Strict (meta toggle): also require no tags and, for tasks, no scheduled/due date.
+    const strictRow = await this.client.getFirst<{ value: string }>(
+      "SELECT value FROM meta WHERE key = ?",
+      [META_KEYS.inboxStrictCriteria],
+      "item.listInbox.strictCriteria",
+    );
+    const strictInbox = strictRow?.value === "true";
+    const tagJoin = strictInbox
+      ? "LEFT JOIN item_tags ON items.id = item_tags.item_id"
+      : "";
+    const strictFilters = strictInbox
+      ? `
+          AND item_tags.item_id IS NULL
+          AND (items.type != 'task' OR (items.task_scheduled_at IS NULL AND items.task_due_at IS NULL))
+        `
+      : "";
+
     const rows = await this.client.getAll<ItemRow>(
       `
         SELECT items.*
         FROM items
-        LEFT JOIN item_tags ON items.id = item_tags.item_id
+        ${tagJoin}
         WHERE items.archived_at IS NULL
           AND items.area_id IS NULL
-          AND item_tags.item_id IS NULL
+          ${strictFilters}
         ORDER BY items.updated_at DESC
       `,
       [],
